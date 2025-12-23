@@ -2,9 +2,6 @@ from flask import Flask
 
 app = Flask(__name__)
 
-if __name__ == "__main__":
-    app.run(debug=True)
-
 
 @app.route("/")
 def main() -> str:
@@ -14,3 +11,12 @@ def main() -> str:
 @app.route("/about")
 def about() -> str:
     return "About page"
+
+
+@app.route(f"/user/<username>")
+def profile(username: str) -> str:
+    return f"hello,{username}"
+
+
+if __name__ == "main":
+    app.run(debug=True)
