@@ -1,34 +1,31 @@
 from flask import Flask, render_template
 
 users = [
-    {"name": "Kostya", "vip": True, "age": 30, "active": True},
-    {"name": "Anna", "vip": False, "age": 16, "active": False},
-    {"name": "Sergey", "vip": True, "age": 22, "active": False},
-]
-
-products = [
-    {"name": "Hammer", "category": "tools", "price": 44, "in_stock": True},
-    {"name": "Tomato", "category": "food", "price": 22, "in_stock": False},
-    {"name": "Vacuum", "category": "electronics", "price": 5, "in_stock": True},
+    {"id": 1, "name": "Kostya", "vip": True, "age": 30, "active": True},
+    {"id": 2, "name": "Anna", "vip": False, "age": 16, "active": False},
+    {"id": 3, "name": "Sergey", "vip": True, "age": 22, "active": False},
+    {"id": 4, "name": "Ivan", "vip": False, "age": 19, "active": True},
 ]
 
 app = Flask(__name__)
 
 
 @app.route("/")
-def main() -> str:
+def index() -> str:
     return render_template("index.html")
 
 
 @app.route("/users")
 def users_function() -> str:
-    return render_template("users.html", users=users)
-
-
-@app.route("/products")
-def products_function() -> str:
-    return render_template("products.html", products=products)
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    for user in users:
+        result = []
+        if user["vip"]:
+            result.append("VIP")
+        if user["active"]:
+            result.append("ACTIVE")
+        if not user["active"]:
+            result.append("INACTIVE")
+        if user["age"] < 18:
+            result.append("UNDERAGE")
+        user["status"] = " ".join(result)
+    return render_template("/users.html", users=users)
