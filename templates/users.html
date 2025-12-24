@@ -7,13 +7,22 @@
 </head>
 
 <body>
+    {% macro result(name,vip,active,age) %}
+    {% set string = name %}
+    {% if vip %}
+    {% set string = string ~ ' (VIP)' %}
+    {% endif %}
+    {% if not active %}
+    {% set string = string ~ ' (INACTIVE)' %}
+    {% endif %}
+    {% if not age >= 18 %}
+    {% set string = string ~ ' (UNDERAGE)' %}
+    {% endif %}
+    <li>{{string}}</li>
+    {% endmacro %}
     <ul>
         {% for user in users %}
-        {% if user.vip %}
-        <li>{{user.name}} (VIP)</li>
-        {% else %}
-        <li>{{user.name}}</li>
-        {% endif %}
+        {{result(user.name,user.vip,user.active,user.age)}}
         {% endfor %}
     </ul>
 </body>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Products</title>
+</head>
+
+<body>
+    {% macro result(name,price,category) %}
+    {% set string = name %}
+    {% if price > 100 %}
+    {% set string = string ~ ' (EXPENSIVE)' %}
+    {% endif %}
+    {% if not price > 10 %}
+    {% set string = string ~ ' (CHEAP)' %}
+    {% endif %}
+    {% if category == "electronics" %}
+    {% set string = string ~ ' (TECH)' %}
+    {% endif %}
+    <li>{{string}}</li>
+    {% endmacro %}
+    <ul>
+        {% for product in products %}
+        {{result(product.name,product.price,product.category)}}
+        {% endfor %}
+    </ul>
+</body>
+
+</html>
