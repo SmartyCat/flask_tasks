@@ -29,3 +29,7 @@ def users_function() -> str:
             result.append("UNDERAGE")
         user["status"] = " ".join(result)
     return render_template("/users.html", users=users)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
