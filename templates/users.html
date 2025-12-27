@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="UTF-8">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -7,9 +7,19 @@
 </head>
 
 <body>
+    {% macro result(user_id,name,vip,active) %}
+    {% set string = "" %}
+    {% if vip %}
+    {% set string = string ~ ' (VIP)' %}
+    {% endif %}
+    {% if not active %}
+    {% set string = string ~ ' (INACTIVE)' %}
+    {% endif %}
+    <li><a href="{{ url_for ('user_function', id=user_id) }}">{{name}}</a> {{string}}</li>
+    {% endmacro %}
     <ul>
         {% for user in users %}
-        <li><a href="{{url_for ('user_function', id=user.id) }}">{{user.name}}</a></li>
+        {{result(user.id,user.name,user.vip,user.active)}}
         {% endfor %}
     </ul>
 </body>

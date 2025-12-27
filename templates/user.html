@@ -3,16 +3,28 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>{{user}}</title>
+    <title>{{user.name}}</title>
 </head>
 
 <body>
     {% if user %}
-    <p>User: {{user}}</p>
+    <ul>
+        <li>Name: {{user.name}}</li>
+        {% if user.vip %}
+        <li>Satus: VIP</li>
+        {% else %}
+        <li>Status: Regular</li>
+        {% endif %}
+        {% if active %}
+        <li>Account: Active</li>
+        {% else %}
+        <li>Account: Inactive</li>
+        {% endif %}
+    </ul>
     {% else %}
     <p>User not found</p>
     {% endif %}
+    <a href="{{ url_for('users_function') }}">Back to users</a>
 </body>
-
 
 </html>

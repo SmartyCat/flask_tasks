@@ -1,12 +1,12 @@
 from flask import Flask, render_template, url_for
 
-app = Flask(__name__)
-
 users = [
-    {"id": 1, "name": "Kostya"},
-    {"id": 2, "name": "Anna"},
-    {"id": 3, "name": "Sergey"},
+    {"id": 1, "name": "Kostya", "vip": True, "active": True},
+    {"id": 2, "name": "Anna", "vip": False, "active": False},
+    {"id": 3, "name": "Sergey", "vip": True, "active": False},
 ]
+
+app = Flask(__name__)
 
 
 @app.route("/")
@@ -23,5 +23,5 @@ def users_function() -> str:
 def user_function(id: int) -> str:
     for user in users:
         if user["id"] == id:
-            return render_template("/user.html", user=user["name"])
-    return render_template("user.html")
+            return render_template("user.html", user=user)
+    return render_template("user.html",user="")
