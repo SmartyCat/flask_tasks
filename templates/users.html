@@ -7,19 +7,19 @@
 </head>
 
 <body>
-    {% macro result(user_id,name,vip,active) %}
-    {% set string = "" %}
+    {% macro result(name,vip,active,id) %}
+    {% set string = '' %}
     {% if vip %}
     {% set string = string ~ ' (VIP)' %}
     {% endif %}
     {% if not active %}
     {% set string = string ~ ' (INACTIVE)' %}
     {% endif %}
-    <li><a href="{{ url_for ('user_function', id=user_id) }}">{{name}}</a> {{string}}</li>
+    <li><a href="{{ url_for('user_function', id=id) }}">{{name}}</a>{{string}}</li>
     {% endmacro %}
     <ul>
         {% for user in users %}
-        {{result(user.id,user.name,user.vip,user.active)}}
+        {{result(user.name,user.vip,user.active,user.id)}}
         {% endfor %}
     </ul>
 </body>

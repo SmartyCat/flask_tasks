@@ -7,24 +7,28 @@
 </head>
 
 <body>
-    {% if user %}
     <ul>
-        <li>Name: {{user.name}}</li>
+        <li>{{user.name}}</li>
         {% if user.vip %}
-        <li>Satus: VIP</li>
+        <li>vip</li>
         {% else %}
-        <li>Status: Regular</li>
+        <li>not vip</li>
         {% endif %}
-        {% if active %}
-        <li>Account: Active</li>
+        {% if user.active %}
+        <li>active</li>
         {% else %}
-        <li>Account: Inactive</li>
+        <li>inactive</li>
         {% endif %}
     </ul>
+    {% if posts %}
+    <ol>
+        {% for post in posts %}
+        <li>{{post}}</li>
+        {% endfor %}
+    </ol>
     {% else %}
-    <p>User not found</p>
+    <p>No posts yet</p>
     {% endif %}
-    <a href="{{ url_for('users_function') }}">Back to users</a>
 </body>
 
 </html>
