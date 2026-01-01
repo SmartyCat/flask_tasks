@@ -10,24 +10,24 @@
     <ul>
         <li>{{user.name}}</li>
         {% if user.vip %}
-        <li>vip</li>
+        <li>(VIP)</li>
         {% else %}
-        <li>not vip</li>
+        <li>(NOT VIP)</li>
         {% endif %}
         {% if user.active %}
-        <li>active</li>
+        <li>ACTIVE</li>
         {% else %}
-        <li>inactive</li>
+        <li>INACTIVE</li>
         {% endif %}
     </ul>
-    {% if posts %}
+    {% if not article %}
+    <p>No published articles</p>
+    {% else %}
     <ol>
-        {% for post in posts %}
-        <li>{{post}}</li>
+        {% for ar in article %}
+        <li>{{ar}}</li>
         {% endfor %}
     </ol>
-    {% else %}
-    <p>No posts yet</p>
     {% endif %}
 </body>
 

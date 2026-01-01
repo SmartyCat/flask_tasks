@@ -3,12 +3,11 @@
 
 <head>
     <meta charset="UTF-8">
-
     <title>Users</title>
 </head>
 
 <body>
-    {% macro result(name,vip,active) %}
+    {% macro result(id,name,vip,active) %}
     {% set string = "" %}
     {% if vip %}
     {% set string = string ~ ' (VIP)' %}
@@ -16,11 +15,11 @@
     {% if not active %}
     {% set string = string ~ ' (INACTIVE)' %}
     {% endif %}
-    <li>{{name}} {{string}}</li>
+    <li><a href="{{ url_for('user_func', id=id) }}">{{name}}</a>{{string}}</li>
     {% endmacro %}
     <ul>
         {% for user in users %}
-        {{result(user.name,user.vip,user.active)}}
+        {{result(user.id,user.name,user.vip,user.active)}}
         {% endfor %}
     </ul>
 </body>

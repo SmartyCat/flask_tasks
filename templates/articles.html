@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Articles</title>
+</head>
+
+<body>
+    <ul>
+        {% for artic in articles %}
+        <li><a href="{{ url_for('art_func', id=artic.id) }}">{{artic.title}}</a></li>
+        {% endfor %}
+    </ul>
+</body>
+
+</html>
