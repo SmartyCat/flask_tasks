@@ -4,15 +4,17 @@
 <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
     <meta charset="UTF-8">
-    <title>{{name}}</title>
+    <title>Result</title>
 </head>
 
-<body class="result">
-    {% if age >= 18 %}
-    <h2>Welcome, {{name}}</h2>
-    {% else %}
-    <h2>Access denied, {{name}}</h2>
-    {% endif %}
+<body>
+    <div class="result">
+        {% if age >= 18 %}
+        <h2>Welcome, {{name}} , {{sex}}!</h2>
+        {% else %}
+        <h2>Access denaied, {{name}}, {{sex}}!</h2>
+        {% endif %}
+    </div>
 </body>
 
 </html>

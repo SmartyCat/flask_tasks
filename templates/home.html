@@ -2,20 +2,38 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" href="{{ url_for ('static', filename='style.css') }}">
     <meta charset="UTF-8">
     <title>Home</title>
 </head>
 
-<body class="home">
+<body>
     <h1>Welcome</h1>
     <form action="{{ url_for('result') }}" method="post">
         <label for="name">Enter your name</label>
         <input id="name" name="name" type="text">
         <br>
-        <label for="age">Enter your age</label>
+        <label for="age"> Enter your age</label>
         <input id="age" name="age" type="number">
         <br>
+        <label for="sex">Check your sex</label>
+        <select id="sex" name="sex">
+            <option value="man">Man</option>
+            <option value="woman">Woman</option>
+        </select>
+        <label for="hobbie">Check your hobies</label>
+        <label id="hobbie">
+            <input type="checkbox" value="sport" name="hobbie">
+            Sport
+        </label>
+        <label id="hobbie">
+            <input type="checkbox" value="music" name="hobbie">
+            Music
+        </label>
+        <label id="hobbie">
+            <input type="checkbox" value="programming" name="hobbie">
+            Programming
+        </label>
         <button type="submit">Submit</button>
     </form>
 </body>

@@ -12,5 +12,8 @@ def home() -> str:
 @app.route("/result", methods=["POST"])
 def result() -> str:
     return render_template(
-        "result.html", name=request.form.get("name"), age=int(request.form.get("age"))
+        "result.html",
+        name=request.form.get("name"),
+        age=int(request.form.get("age")),
+        sex=request.form.get("sex"),
     )
