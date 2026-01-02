@@ -2,16 +2,19 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
     <meta charset="UTF-8">
     <title>Home</title>
 </head>
 
-<body>
+<body class="home">
     <h1>Welcome</h1>
-    <form action="{{ url_for('hello')}}" method="post">
+    <form action="{{ url_for('result') }}" method="post">
         <label for="name">Enter your name</label>
-        <input id="name" type="text" name="name">
+        <input id="name" name="name" type="text">
+        <br>
+        <label for="age">Enter your age</label>
+        <input id="age" name="age" type="number">
         <br>
         <button type="submit">Submit</button>
     </form>
