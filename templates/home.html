@@ -2,16 +2,18 @@
 <html lang="en">
 
 <head>
+    <link href="{{ url_for('static', filename='style.css') }}" rel="stylesheet">
     <meta charset="UTF-8">
     <title>Home</title>
 </head>
 
-<body>
-    <h2>Home</h2>
-    <br>
-    <a href="{{ url_for('users_func') }}">Users</a>
-    <br>
-    <a href="{{ url_for('articles_func') }}">Articles</a>
+<body class="home">
+    <h1>Home</h1>
+    <ul>
+        <li><a href="/users">All users</a></li>
+        <li><a href="/users/active">Active users</a></li>
+        <li><a href="/users/vip">VIP users</a></li>
+    </ul>
 </body>
 
 </html>

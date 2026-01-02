@@ -1,0 +1,20 @@
+h1 {
+    color: brown;
+}
+
+a {
+    color: blue;
+}
+
+.home {
+    background-color: antiquewhite;
+    padding: 20px;
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+}
+
+.users {
+    font-family: 'Courier New', Courier, monospace;
+    background-color: aquamarine;
+    padding: 25px;
+    color: blueviolet;
+}

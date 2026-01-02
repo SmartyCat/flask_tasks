@@ -2,24 +2,27 @@
 <html lang="en">
 
 <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css')}}">
     <meta charset="UTF-8">
     <title>Users</title>
 </head>
 
-<body>
-    {% macro result(id,name,vip,active) %}
-    {% set string = "" %}
-    {% if vip %}
-    {% set string = string ~ ' (VIP)' %}
-    {% endif %}
-    {% if not active %}
-    {% set string = string ~ ' (INACTIVE)' %}
-    {% endif %}
-    <li><a href="{{ url_for('user_func', id=id) }}">{{name}}</a>{{string}}</li>
-    {% endmacro %}
+<body class="users">
     <ul>
         {% for user in users %}
-        {{result(user.id,user.name,user.vip,user.active)}}
+        <li>{{user.name}}</li>
+        <ol>
+            {% if user.vip %}
+            <li>(VIP)</li>
+            {% else %}
+            <li>(NOT VIP)</li>
+            {% endif %}
+            {% if not user.active %}
+            <li>(INACTIVE)</li>
+            {% else %}
+            <li>(ACTIVE)</li>
+            {% endif %}
+        </ol>
         {% endfor %}
     </ul>
 </body>
