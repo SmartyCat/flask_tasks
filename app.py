@@ -9,11 +9,21 @@ def home() -> str:
     return render_template("home.html")
 
 
-@app.route("/result", methods=["POST"])
-def result() -> str:
+@app.route("/profile")
+def profile() -> str:
+    return render_template("profile.html")
+
+
+@app.route("/summary", methods=["POST"])
+def summary() -> str:
     return render_template(
-        "result.html",
-        name=request.form.get("name"),
+        "summary.html",
         age=int(request.form.get("age")),
-        sex=request.form.get("sex"),
+        name=request.form.get("name"),
+        city=request.form.get("city"),
     )
+
+
+@app.route("/about")
+def about() -> str:
+    return render_template("about.html")
