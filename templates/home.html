@@ -2,17 +2,19 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="{{url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <meta charset="UTF-8">
     <title>Home</title>
 </head>
-
 <body>
-    <h1>Welcome to my first web-site!</h1>
-    <div class="container">
-        <a href="{{url_for('profile')}}">Select profile</a>
-        <a href="{{url_for('about')}}">About</a>
-    </div>
+    {% for msg in get_flashed_messages() %}
+    {{msg}}
+    {% endfor %}
+    <form action="/" method="post">
+        <label for="name">Enter your name</label>
+        <input id="name" name="name" type="text">
+        <button type="submit">Submit</button>
+    </form>
 </body>
 
 </html>
