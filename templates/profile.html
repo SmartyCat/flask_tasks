@@ -2,26 +2,26 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
     <meta charset="UTF-8">
-    <title>Profile of {{name}}</title>
+    <title>Profile of {{session.person[0]}}</title>
 </head>
 
 <body>
-    {% if not name and not age %}
-    <h2>Profile not created</h2>
-    {% else %}
     <ul>
-        <li>{{name}}</li>
-        <li>{{age}}</li>
-        {% if age >= 18 %}
-        <li>Adult</li>
-        {% else %}
-        <li>Minor</li>
-        {% endif %}
+        <li>Name:{{session.person[0]}}</li>
+        <li>Age:{{session.person[1]}}</li>
+        <li>Sex:{{session.person[2]}}</li>
+        <li>
+            Hobbies
+            <ol>
+                {% for h in session.person[3] %}
+                <li>{{h}}</li>
+                {% endfor %}
+            </ol>
+        </li>
     </ul>
-    {% endif %}
-    <a href="{{url_for('cleaar')}}">Clear profile</a>
+    <a href="{{url_for('logout')}}">logout</a>
 </body>
 
 </html>
