@@ -2,22 +2,20 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
     <meta charset="UTF-8">
     <title>Home</title>
 </head>
 
 <body>
-    <h1>Welcome, home!</h1>
+    <h1>Welcome to home!</h1>
     <div class="container">
-        {% for cat,msg in get_flashed_messages(True) %}
-        <div class="flash {{cat}}">{{msg}}</div>
-        {% endfor %}
         <form action="/" method="post">
-            <label for="name">Enter your name</label>
+            <label for="name"> Enter your name</label>
             <input id="name" name="name" type="text">
-            <br>
-            <button type="submit">Submit</button>
+            <label for="age">Enter your age</label>
+            <input id="age" name="age" type="number">
+            <button type="submit">Save</button>
         </form>
     </div>
 </body>

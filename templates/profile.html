@@ -2,29 +2,26 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
     <meta charset="UTF-8">
-    <title>Profile</title>
+    <title>Profile of {{name}}</title>
 </head>
 
 <body>
-    <h2>Registrtion</h2>
-    <div class="container">
-        <form action="{{url_for('summary')}}" method="post">
-            <label for="name">Enter your name</label>
-            <input id="name" name="name" type="text">
-            <label for="age">Enter your age</label>
-            <input id="age" name="age" type="number">
-            <label for="city">Enter your city</label>
-            <input id="city" name="city" type="city">
-            <select>
-                <option value="student">Student</option>
-                <option value="worker">Worker</option>
-                <option value="other">Other</option>
-            </select>
-            <button type="submit">Submit</button>
-        </form>
-    </div>
+    {% if not name and not age %}
+    <h2>Profile not created</h2>
+    {% else %}
+    <ul>
+        <li>{{name}}</li>
+        <li>{{age}}</li>
+        {% if age >= 18 %}
+        <li>Adult</li>
+        {% else %}
+        <li>Minor</li>
+        {% endif %}
+    </ul>
+    {% endif %}
+    <a href="{{url_for('cleaar')}}">Clear profile</a>
 </body>
 
 </html>

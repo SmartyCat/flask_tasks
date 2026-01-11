@@ -1,28 +1,30 @@
-from flask import Flask, render_template, request, flash
+from flask import Flask, render_template, request, redirect, session, url_for
 
 app = Flask(__name__)
-names = []
-app.config["SECRET_KEY"] = "dfkbjndjgfo"
+app.config["SECRET_KEY"] = "sdfjbkfghbdlf"
 
 
 @app.route("/", methods=["GET", "POST"])
 def home() -> str:
-    name = request.form.get("name")
-    if name:
-        names.append(name)
-    if request.method == "POST":
-        if name:
-            flash("Success", category="success")
-        else:
-            flash("Error", category="error")
-    return render_template("home.html", name=name)
+    if "name_age" in session:
+        return redirect(url_for("profile"))
+
+    elif request.method == "POST":
+        name = request.form.get("name")
+        age = request.form.get("age")
+        session["name_age"] = (name, age)
+        return redirect(url_for("profile", name=name, age=age))
+    return render_template("home.html")
 
 
 @app.route("/profile")
 def profile() -> str:
-    return render_template("profile.html", name=names[-1])
+    return render_template(
+        "profile.html", name=session["name_age"][0], age=int(session["name_age"][1])
+    )
 
 
-@app.errorhandler(404)
-def error(error) -> str:
-    return render_template("error.html")
+@app.route("/clear")
+def cleaar() -> str:
+    session.clear()
+    return redirect(url_for("home"))
