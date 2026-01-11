@@ -1,17 +1,15 @@
-from flask import Flask, render_template, flash, request
-
+from flask import Flask, render_template, request, flash
 
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "sdfvsfv"
 
-app.config["SECRET_KEY"] = "dbdgb"
 
-
-@app.route("/",methods=["GET","POST"])
+@app.route("/", methods=["POST", "GET"])
 def home() -> str:
+    name = request.form.get("name")
     if request.method == "POST":
-        name = request.form.get("name")
         if name:
-            flash (f"Hello, {name}!")
+            flash(f"Hello, {name}!", category="success")
         else:
-            flash ("Name is reqired!")
+            flash("Name is required",category="error")
     return render_template("home.html")
