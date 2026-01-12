@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+
+<body class="dashboard">
+    {% for cat,msg in get_flashed_messages(True) %}
+    <div class="flash {{cat}}">{{msg}}</div>
+    {% endfor %}
+    <div class="container">
+        <ul>
+            <li>{{session.person[0]}}</li>
+            <li>{{session.person[1]}}</li>
+        </ul>
+        <a href="{{url_for('edit')}}">
+            <button type="submit">
+                Edit
+            </button>
+        </a>
+        <a href="{{url_for('logout')}}">
+            <button type="submit">Logout</button>
+        </a>
+    </div>
+</body>
+
+</html>
