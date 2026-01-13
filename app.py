@@ -1,54 +1,56 @@
-from flask import Flask, request, redirect, render_template, flash, session, url_for
-
+from flask import (
+    Flask,
+    url_for,
+    redirect,
+    request,
+    render_template,
+    flash,
+    session,
+    abort,
+)
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "gfbrgkj"
+app.config["SECRET_KEY"] = "dgkjnb"
 
 
 @app.route("/")
 def home() -> str:
-    if "person" in session:
-        return redirect(url_for("dashboard"))
     return render_template("home.html")
 
 
-@app.route("/form", methods=["GET", "POST"])
-def form() -> str:
+@app.route("/login", methods=["GET", "POST"])
+def login() -> str:
     if request.method == "POST":
-        name, city = request.form.get("name"), request.form.get("city")
-        if name and city and not session:
-            session["person"] = (name, city)
-            flash("Profile created", category="success")
-            return redirect(url_for("dashboard"))
-        elif name and city and session:
-            session["person"] = (name, city)
-            flash("Profile update", category="success")
-            return redirect(url_for("dashboard"))
+        name, age = request.form.get("name"), int(request.form.get("age"))
+        if not name:
+            flash("You don't write your name", category="error")
+        elif age < 16:
+            flash("You are too young", category="error")
         else:
-            flash("Fill all fields", category="error")
-    return render_template("form.html")
+            if "user" in session:
+                flash("Successful updating", category="success")
+            else:
+                flash("You are successful login", category="success")
+            session["user"] = (name, age)
+            return redirect(url_for("profile", name=session["user"][0]))
+    return render_template("login.html")
 
 
-@app.route("/dashboard")
-def dashboard() -> str:
-    if not session:
-        flash("Access denied", category="error")
-        return redirect(url_for("form"))
-    return render_template("dashboard.html")
-
-
-@app.route("/edit")
-def edit() -> str:
-    return redirect(url_for("form"))
+@app.route("/profile/<name>")
+def profile(name: str) -> str:
+    if "user" not in session or session["user"][0] != name:
+        abort(401)
+    return render_template("profile.html")
 
 
 @app.route("/logout")
 def logout() -> str:
     session.clear()
-    flash("Logged out", category="success")
+    flash("Logged out successfully", category="success")
     return redirect(url_for("home"))
 
 
 @app.errorhandler(404)
-def error(error) -> str:
+def base_error(error) -> str:
     return render_template("error.html")
+

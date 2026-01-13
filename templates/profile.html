@@ -4,24 +4,30 @@
 <head>
     <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
     <meta charset="UTF-8">
-    <title>Profile of {{session.person[0]}}</title>
+    <title>Profile of {{session.user[0]}}</title>
 </head>
 
-<body>
-    <ul>
-        <li>Name:{{session.person[0]}}</li>
-        <li>Age:{{session.person[1]}}</li>
-        <li>Sex:{{session.person[2]}}</li>
-        <li>
-            Hobbies
-            <ol>
-                {% for h in session.person[3] %}
-                <li>{{h}}</li>
-                {% endfor %}
-            </ol>
-        </li>
-    </ul>
-    <a href="{{url_for('logout')}}">logout</a>
+<body class="profile">
+    {% for cat,msg in get_flashed_messages(True) %}
+    <div class="flsh {{cat}}">{{msg}}</div>
+    {% endfor %}
+    <div class="container">
+        <ul>
+            <li>{{session.user[0]}}</li>
+            <li>{{session.user[1]}}</li>
+            {% if session.user[1] >= 18 %}
+            <li>Adult</li>
+            {% else %}
+            <li>Teen</li>
+            {% endif %}
+        </ul>
+        <a href="{{url_for('login')}}">
+            <button class="submit">Edit</button>
+        </a>
+        <a href="{{url_for('logout')}}">
+            <button class="submit">Logout</button>
+        </a>
+    </div>
 </body>
 
 </html>

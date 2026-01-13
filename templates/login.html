@@ -2,22 +2,24 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
+    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
     <meta charset="UTF-8">
-    <title>Form</title>
+    <title>Login</title>
 </head>
 
 <body>
-    <h1>Registration</h1>
+    <h1>Autorization</h1>
     <div class="container">
         {% for cat,msg in get_flashed_messages(True) %}
-        <div class="flashed {{cat}}">{{msg}}</div>
+        <div class="flash {{cat}}">{{msg}}</div>
         {% endfor %}
-        <form action="/form" method="post">
+        <form action="{{url_for('login')}}" method="post">
             <label for="name">Enter your name</label>
             <input id="name" name="name" type="text">
-            <label for="city">Enter your city</label>
-            <input id="city" name="city" type="text">
+            <br>
+            <label for="age">Enter your age</label>
+            <input id="age" name="age" type="text">
+            <br>
             <button type="submit">Save</button>
         </form>
     </div>

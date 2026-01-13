@@ -7,14 +7,26 @@
     <title>Home</title>
 </head>
 
-<body>
+<body class="home">
+    <h1>Welcome</h1>
     {% for cat,msg in get_flashed_messages(True) %}
     <div class="flash {{cat}}">{{msg}}</div>
     {% endfor %}
-    <h1>Welcome</h1>
-    <a href="{{url_for('form')}}">
-        <button type="submit">Go to form</button>
-    </a>
+    <div class="container">
+        {% if not 'user' in session %}
+        <a href="{{url_for('login')}}">
+            <button type="submit">Login</button>
+        </a>
+        {% else %}
+        <p>Hello, {{session.user[0]}}</p>
+        <a href="{{url_for('profile',name=session.user[0])}}">
+            <button type="submit">Profile</button>
+        </a>
+        <a href="{{url_for('logout')}}">
+            <button type="submit">Logout</button>
+        </a>
+        {% endif %}
+    </div>
 </body>
 
 </html>
