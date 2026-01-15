@@ -1,56 +1,40 @@
-from flask import (
-    Flask,
-    url_for,
-    redirect,
-    request,
-    render_template,
-    flash,
-    session,
-    abort,
-)
+from flask import Flask, render_template, g
+import sqlite3
+
+
+DATABASE = "test.db"
+SECRET_KEY = "sfdf"
+DEBUG = True
 
 app = Flask(__name__)
-app.config["SECRET_KEY"] = "dgkjnb"
+app.config.from_object(__name__)
+
+
+def connect_db():
+    conn = sqlite3.connect(app.config["DATABASE"])
+    return conn
+
+
+def create_db() -> None:
+    db = connect_db()
+    with app.open_resource("test.sql", mode="r") as f:
+        db.cursor().executescript(f.read())
+    db.commit()
+    db.close()
+
+
+def get_db() -> None:
+    if not hasattr(g, "link_db"):
+        g.link_db = connect_db()
+
+
+@app.teardown_appcontext
+def close_db(error) -> None:
+    if hasattr(g, "link_db"):
+        g.link_db.close()
 
 
 @app.route("/")
-def home() -> str:
-    return render_template("home.html")
-
-
-@app.route("/login", methods=["GET", "POST"])
-def login() -> str:
-    if request.method == "POST":
-        name, age = request.form.get("name"), int(request.form.get("age"))
-        if not name:
-            flash("You don't write your name", category="error")
-        elif age < 16:
-            flash("You are too young", category="error")
-        else:
-            if "user" in session:
-                flash("Successful updating", category="success")
-            else:
-                flash("You are successful login", category="success")
-            session["user"] = (name, age)
-            return redirect(url_for("profile", name=session["user"][0]))
-    return render_template("login.html")
-
-
-@app.route("/profile/<name>")
-def profile(name: str) -> str:
-    if "user" not in session or session["user"][0] != name:
-        abort(401)
-    return render_template("profile.html")
-
-
-@app.route("/logout")
-def logout() -> str:
-    session.clear()
-    flash("Logged out successfully", category="success")
-    return redirect(url_for("home"))
-
-
-@app.errorhandler(404)
-def base_error(error) -> str:
-    return render_template("error.html")
-
+def index() -> str:
+    db = connect_db()
+    return render_template("index.html", users=db.cursor().fetchall())
