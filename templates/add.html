@@ -4,23 +4,22 @@
 <head>
     <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Add</title>
 </head>
 
 <body>
-    <h1>Autorization</h1>
+    <h1>Add user</h1>
     <div class="container">
-        {% for cat,msg in get_flashed_messages(True) %}
-        <div class="flash {{cat}}">{{msg}}</div>
-        {% endfor %}
-        <form action="{{url_for('login')}}" method="post">
-            <label for="name">Enter your name</label>
+        <form action="{{url_for('add')}}" method="post">
+            <label for="name">Enter name</label>
             <input id="name" name="name" type="text">
             <br>
             <label for="age">Enter your age</label>
             <input id="age" name="age" type="text">
             <br>
-            <button type="submit">Save</button>
+            <button type="submit">
+                Save
+            </button>
         </form>
     </div>
 </body>
