@@ -1,10 +1,9 @@
-from flask import Flask, render_template, g, request, url_for, redirect
+from flask import Flask, render_template, g, request, redirect, url_for, flash
 import sqlite3
-
 
 DATABASE = "test.db"
 DEBUG = True
-SECRET_KEY = "dfvdf"
+SECRET_KEY = "sdfsfvg"
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -16,7 +15,7 @@ def connect_db() -> sqlite3.Connection:
 
 def create_db() -> None:
     db = connect_db()
-    with app.open_resource("test.sql",mode="r") as f:
+    with app.open_resource("test.sql", mode="r") as f:
         db.cursor().executescript(f.read())
     db.commit()
     db.close()
@@ -38,16 +37,31 @@ def close_db(error: Exception | None) -> None:
 def index() -> str:
     db = get_db()
     return render_template(
-        "index.html", users=db.cursor().execute("SELECT * FROM users").fetchall()
+        "index.html", users=db.cursor().execute("SELECT * FROM users;").fetchall()
     )
 
 
-@app.route("/add", methods=["GET", "POST"])
+@app.route("/add", methods=["POST", "GET"])
 def add() -> str:
     db = get_db()
     if request.method == "POST":
-        name, age = request.form.get("name"), request.form.get("age")
-        db.cursor().execute("INSERT INTO users(name,age) VALUES(?, ?)", (name, age))
-        db.commit()
-        return redirect(url_for("index"))
+        name, age = request.form.get("name"), int(request.form.get("age"))
+        if name and age:
+            db.cursor().execute(
+                "INSERT INTO users(name, age) VALUES(?, ?)", (name, age)
+            )
+            db.commit()
+            flash("The user was added", category="success")
+            return redirect(url_for("index"))
     return render_template("add.html")
+
+
+@app.route("/delete/<int:id>")
+def delete(id: int) -> str:
+    db = get_db()
+    for user in db.cursor().execute("SELECT id FROM users").fetchall():
+        if id in user:
+            db.cursor().execute("DELETE FROM users WHERE id = ?", (id,))
+            db.commit()
+            flash("User was deleted", category="success")
+            return redirect(url_for("index"))
