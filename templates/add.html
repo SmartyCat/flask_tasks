@@ -2,20 +2,19 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
     <meta charset="UTF-8">
     <title>Add</title>
 </head>
 
 <body>
-    <h1>Add user</h1>
+    <h1>Add a new task</h1>
     <div class="container">
         <form action="{{url_for('add')}}" method="post">
-            <label for="name">Enter your name</label>
-            <input id="name" name="name" type="text">
+            <label for="title">Enter a title</label>
+            <input id="title" name="title" type="text">
             <br>
-            <label for="age">Enter your age</label>
-            <input id="age" name="age" type="text">
+            <textarea id="article" name="article" aria-setsize="1040">Write your article down</textarea>
             <br>
             <button type="submit">Save</button>
         </form>
