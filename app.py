@@ -1,22 +1,20 @@
-from flask import Flask, make_response, request
-
+from flask import Flask, make_response, request, render_template, redirect, url_for
 
 DEBUG = True
-SECRET_KEY = "sdfvfsv"
+SECRET_KEY = "sdsfv"
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 
 
-@app.route("/")
+@app.route("/", methods=["GET", "POST"])
 def index() -> str:
-    visits = request.cookies.get("visits")
-    if not visits:
-        resp = make_response("Welcome! This your first visit.")
-        resp.set_cookie("visits", "1")
-    else:
-        resp = make_response(f"You have visited this page {visits} times")
-        visits = int(visits)
-        visits += 1
-        resp.set_cookie("visits", str(visits))
+    name = request.cookies.get("name")
+    resp = make_response(
+        render_template("index.html", name=name if name else "stranger")
+    )
+    if request.method == "POST":
+        name = request.form.get("name")
+        if name:
+            resp.set_cookie("name", name)
     return resp
