@@ -9,9 +9,9 @@ app.config.from_object(__name__)
 
 @app.route("/")
 def index() -> str:
-    username = request.form.get("username")
+    username = request.cookies.get("username")
     if username:
-        result = "Hello, {username}"
+        result = f"Hello, {username}"
     else:
         result = "Hello, stranger"
     resp = make_response(result)
