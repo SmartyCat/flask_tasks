@@ -1,7 +1,8 @@
 from flask import Flask, make_response, request
 
+
 DEBUG = True
-SECRET_KEY = "sdfvdf"
+SECRET_KEY = "sdfvfsv"
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -9,13 +10,13 @@ app.config.from_object(__name__)
 
 @app.route("/")
 def index() -> str:
-    username = request.cookies.get("username")
-    if username:
-        result = f"Hello, {username}"
+    visits = request.cookies.get("visits")
+    if not visits:
+        resp = make_response("Welcome! This your first visit.")
+        resp.set_cookie("visits", "1")
     else:
-        result = "Hello, stranger"
-    resp = make_response(result)
-    resp.set_cookie("username", "Alex")
-
+        resp = make_response(f"You have visited this page {visits} times")
+        visits = int(visits)
+        visits += 1
+        resp.set_cookie("visits", str(visits))
     return resp
-
