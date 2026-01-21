@@ -1,8 +1,8 @@
-from flask import Flask, session, render_template, redirect, request, flash, url_for
+from flask import Flask, render_template, request, session, url_for, redirect, flash
 
 
-SECRET_KEY = "SJFVHFDIU8234SDVK23"
 DEBUG = True
+SECRET_KEY = "dfvnl12zsdfv"
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -16,13 +16,11 @@ def index() -> str:
 @app.route("/login", methods=["GET", "POST"])
 def login() -> str:
     if request.method == "POST":
-        username = request.form.get("username")
-        if not username:
-            flash("error", category="error")
-        else:
-            session["username"] = username
-            session["actions"] = 0
-            return redirect(url_for("dashboard"))
+        username, role = request.form.get("username"), request.form.get("role")
+        session["username"] = username
+        session["role"] = role
+        session["actions"] = 0
+        return redirect(url_for("dashboard"))
     return render_template("login.html")
 
 
@@ -34,6 +32,7 @@ def dashboard() -> str:
         "dashboard.html",
         username=session.get("username"),
         actions=session.get("actions"),
+        role=session.get("role"),
     )
 
 
@@ -42,14 +41,20 @@ def action() -> str:
     if "username" not in session:
         return redirect(url_for("login"))
     session["actions"] += 1
-    flash("Action counted", category="success")
+    flash("Action counted")
+    return redirect(url_for("dashboard"))
+
+
+@app.route("/admin")
+def admin() -> str:
+    if "username" in session and session.get("role") == "admin":
+        return "Hello, admin"
+    flash("Access denied", category="error")
     return redirect(url_for("dashboard"))
 
 
 @app.route("/logout")
 def logout() -> str:
-    if "username" not in session:
+    if session:
+        session.clear()
         return redirect(url_for("login"))
-    session.clear()
-    flash("Logged out", category="success")
-    return redirect(url_for("login"))
