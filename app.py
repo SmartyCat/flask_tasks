@@ -1,7 +1,6 @@
-from flask import Flask, make_response, request, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, session, url_for, request
 
-DEBUG = True
-SECRET_KEY = "sdsfv"
+SECRET_KEY = "sdkvj12e23sld"
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -9,12 +8,9 @@ app.config.from_object(__name__)
 
 @app.route("/", methods=["GET", "POST"])
 def index() -> str:
-    name = request.cookies.get("name")
-    resp = make_response(
-        render_template("index.html", name=name if name else "stranger")
-    )
+    if "count" not in session:
+        session["count"] = 0
     if request.method == "POST":
-        name = request.form.get("name")
-        if name:
-            resp.set_cookie("name", name)
-    return resp
+        session["count"] += 1
+        return redirect(url_for("index"))
+    return render_template("index.html", count=session["count"])

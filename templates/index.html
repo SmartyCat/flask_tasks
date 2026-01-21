@@ -2,33 +2,15 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="{{url_for('static', filename='style/css')}}">
     <meta charset="UTF-8">
     <title>Home</title>
 </head>
 
 <body>
-    <h1>Welcome</h1>
-    {% for cat,msg in get_flashed_messages(True) %}
-    <div class="flash {{cat}}">{{msg}}</div>
-    {% endfor %}
-    {% if not tasks %}
-    <p>No tasks yet</p>
-    {% else %}
-    <ul>
-        {% for task in tasks %}
-        <li>{{task[1]}} | {{task[2]}} | <a href="{{url_for('delete', id=task[0])}}"><button type="submit"
-                    class="delete">
-                    DELETE
-                </button></a></li>
-        {% endfor %}
-    </ul>
-    {% endif %}
-    <a href="{{url_for('add')}}">
-        <button type="submit">
-            Add a task
-        </button>
-    </a>
+    <h1>{{count}}</h1>
+    <form action="{{url_for('index')}}" method="post">
+        <button type="submit">Submit</button>
+    </form>
 </body>
 
 </html>
