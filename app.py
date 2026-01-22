@@ -1,60 +1,69 @@
-from flask import Flask, render_template, request, session, url_for, redirect, flash
+from flask import render_template, request, g, flash, Flask, redirect, url_for
+import sqlite3
+from werkzeug.security import generate_password_hash, check_password_hash
 
-
+DATABASE = "users.db"
 DEBUG = True
-SECRET_KEY = "dfvnl12zsdfv"
+SECRET_KEY = "sdfng1l"
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 
 
+def connect_db() -> sqlite3.Connection:
+    return sqlite3.connect(app.config["DATABASE"])
+
+
+def create_db() -> None:
+    db = connect_db()
+    with app.open_resource("users.sql", mode="r") as f:
+        db.cursor().executescript(f.read())
+    db.commit()
+    db.close()
+
+
+def get_db() -> sqlite3.Connection:
+    if not hasattr(g, "link_db"):
+        g.link_db = connect_db()
+    return g.link_db
+
+
+@app.teardown_appcontext
+def close_db(error: Exception | None) -> None:
+    if hasattr(g, "link_db"):
+        g.link_db.close()
+
+
 @app.route("/")
 def index() -> str:
-    return redirect(url_for("login"))
+    return redirect(url_for("register"))
 
 
-@app.route("/login", methods=["GET", "POST"])
-def login() -> str:
+@app.route("/register", methods=["GET", "POST"])
+def register() -> str:
+    db = get_db()
     if request.method == "POST":
-        username, role = request.form.get("username"), request.form.get("role")
-        session["username"] = username
-        session["role"] = role
-        session["actions"] = 0
-        return redirect(url_for("dashboard"))
-    return render_template("login.html")
+        username, password, email = (
+            request.form.get("username"),
+            generate_password_hash(request.form.get("password")),
+            request.form.get("email"),
+        )
+        if username and password and email:
+            db.cursor().execute(
+                "INSERT INTO users(username,password,email) VALUES(?, ?, ?)",
+                (username, password, email),
+            )
+            flash("The user was added", category="success")
+            db.commit()
+            return redirect(url_for("users"))
+        else:
+            flash("Error", category="error")
+    return render_template("register.html")
 
 
-@app.route("/dashboard")
-def dashboard() -> str:
-    if "username" not in session:
-        return redirect(url_for("login"))
+@app.route("/users")
+def users() -> str:
+    db = get_db()
     return render_template(
-        "dashboard.html",
-        username=session.get("username"),
-        actions=session.get("actions"),
-        role=session.get("role"),
+        "users.html", u=db.cursor().execute("SELECT * FROM users").fetchall()
     )
-
-
-@app.route("/action")
-def action() -> str:
-    if "username" not in session:
-        return redirect(url_for("login"))
-    session["actions"] += 1
-    flash("Action counted")
-    return redirect(url_for("dashboard"))
-
-
-@app.route("/admin")
-def admin() -> str:
-    if "username" in session and session.get("role") == "admin":
-        return "Hello, admin"
-    flash("Access denied", category="error")
-    return redirect(url_for("dashboard"))
-
-
-@app.route("/logout")
-def logout() -> str:
-    if session:
-        session.clear()
-        return redirect(url_for("login"))
