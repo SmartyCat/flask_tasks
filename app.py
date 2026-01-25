@@ -1,12 +1,12 @@
-from flask import Flask, redirect, render_template, flash, request, session, url_for, g
+from flask import Flask, render_template, request, redirect, session, g, url_for, flash
 import sqlite3
-from flask_login import LoginManager, login_user
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import LoginManager, current_user, login_required, login_user
 from userlogin import UserLogin
+from werkzeug.security import generate_password_hash, check_password_hash
 
 DATABASE = "users.db"
 DEBUG = True
-SECRET_KEY = "sfkgm2;s;fv234"
+SECRET_KEY = "sfkvjkf789kmsfm1"
 
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -20,8 +20,8 @@ def connect_db() -> sqlite3.Connection:
 
 def create_db() -> None:
     db = connect_db()
-    with app.open_resource("users.sql", mode="r") as file:
-        db.cursor().executescript(file.read())
+    with app.open_resource("users.sql", mode="r") as f:
+        db.cursor().executescript(f.read())
     db.commit()
     db.close()
 
@@ -51,16 +51,17 @@ def register() -> str:
             request.form.get("password")
         )
         if not username or not password:
-            flash("You didn't fill all the fills", category="error")
+            flash("You must fill all the fills", category="error")
         elif (
             db.cursor()
-            .execute("SELECT username FROM users WHERE username = ?", (username,))
-            .fetchall()
+            .execute("SELECT * FROM users WHERE username = ?", (username,))
+            .fetchone()
         ):
-            flash("The user exsists", category="error")
+            flash("The user already exists", category="error")
         else:
             db.cursor().execute(
-                "INSERT INTO users(username,password) VALUES(?,?)", (username, password)
+                "INSERT INTO users(username, password) VALUES(?, ?)",
+                (username, password),
             )
             db.commit()
             return redirect(url_for("login"))
@@ -77,36 +78,32 @@ def login() -> str:
                 "SELECT * FROM users WHERE username = ?",
                 (request.form.get("username"),),
             )
-            .fetchall()
+            .fetchone()
         )
-        if user and check_password_hash(user[0][2], request.form.get("password")):
-            user_login = UserLogin().create(user)
-            login_user(user_login)
+        print(user)
+        if not user:
+            flash("The user doesn't exist", category="error")
+        elif not check_password_hash(user[2], request.form.get("password")):
+            flash("Incorrect password", category="error")
+        else:
+            userlogin = UserLogin().create(user)
+            login_user(userlogin)
             return redirect(url_for("profile"))
-        flash("Incorrect", category="error")
     return render_template("login.html")
 
 
 @login_manager.user_loader
-def load_user(user_id: int) -> tuple:
-    db = get_db()
-    return UserLogin().fromDB(user_id, db)
+def load_user(user_id: int) -> UserLogin:
+    return UserLogin().fromDB(user_id, get_db())
 
 
 @app.route("/profile")
+@login_required
 def profile() -> str:
-    db = get_db()
-    if session:
-        return render_template(
-            "profile.html",
-            user=db.cursor().execute(
-                "SELECT username FROM users WHERE id = ?", (session.get("_user_id"),)
-            ).fetchone()[0],
-        )
-    return "Oops"
+    return render_template("profile.html", user=current_user.user[1])
 
 
 @app.route("/logout")
-def logout() -> str:
+def logout() -> None:
     session.clear()
     return redirect(url_for("login"))
