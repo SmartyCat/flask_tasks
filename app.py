@@ -1,17 +1,27 @@
-from flask import Flask, render_template, request, redirect, session, g, url_for, flash
+from flask import Flask, render_template, request, g, redirect, url_for, session, flash
 import sqlite3
-from flask_login import LoginManager, current_user, login_required, login_user
-from userlogin import UserLogin
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import (
+    LoginManager,
+    login_user,
+    login_required,
+    current_user,
+    logout_user,
+)
+from userlogin import UserLogin
 
 DATABASE = "users.db"
 DEBUG = True
-SECRET_KEY = "sfkvjkf789kmsfm1"
+SECRET_KEY = "sfjvhdfll;134sfv"
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-login_manager = LoginManager(app)
+
+login_manger = LoginManager(app)
+login_manger.login_view = "login"
+login_manger.login_message = "You need to enter in the system"
+login_manger.login_message_category = "error"
 
 
 def connect_db() -> sqlite3.Connection:
@@ -20,8 +30,8 @@ def connect_db() -> sqlite3.Connection:
 
 def create_db() -> None:
     db = connect_db()
-    with app.open_resource("users.sql", mode="r") as f:
-        db.cursor().executescript(f.read())
+    with app.open_resource("users.sql", mode="r") as file:
+        db.cursor().executescript(file.read())
     db.commit()
     db.close()
 
@@ -46,11 +56,15 @@ def index() -> str:
 @app.route("/register", methods=["GET", "POST"])
 def register() -> str:
     db = get_db()
+    if current_user.is_authenticated:
+        return redirect(url_for("profile"))
     if request.method == "POST":
-        username, password = request.form.get("username"), generate_password_hash(
-            request.form.get("password")
+        username, password, check_password = (
+            request.form.get("username"),
+            request.form.get("password"),
+            request.form.get("check"),
         )
-        if not username or not password:
+        if not username or not password or not check_password:
             flash("You must fill all the fills", category="error")
         elif (
             db.cursor()
@@ -58,12 +72,15 @@ def register() -> str:
             .fetchone()
         ):
             flash("The user already exists", category="error")
+        elif password != check_password:
+            flash("The passwords don't match", category="error")
         else:
             db.cursor().execute(
-                "INSERT INTO users(username, password) VALUES(?, ?)",
-                (username, password),
+                "INSERT INTO users(username,password) VALUES(?, ?)",
+                (username, generate_password_hash(password)),
             )
             db.commit()
+            flash("Success", category="success")
             return redirect(url_for("login"))
     return render_template("register.html")
 
@@ -80,19 +97,20 @@ def login() -> str:
             )
             .fetchone()
         )
-        print(user)
         if not user:
             flash("The user doesn't exist", category="error")
         elif not check_password_hash(user[2], request.form.get("password")):
             flash("Incorrect password", category="error")
         else:
-            userlogin = UserLogin().create(user)
-            login_user(userlogin)
+            user_login = UserLogin().create(user)
+            rm = True if request.form.get("remember") else False
+            login_user(user_login, remember=rm)
+            flash("Success", category="success")
             return redirect(url_for("profile"))
     return render_template("login.html")
 
 
-@login_manager.user_loader
+@login_manger.user_loader
 def load_user(user_id: int) -> UserLogin:
     return UserLogin().fromDB(user_id, get_db())
 
@@ -100,10 +118,10 @@ def load_user(user_id: int) -> UserLogin:
 @app.route("/profile")
 @login_required
 def profile() -> str:
-    return render_template("profile.html", user=current_user.user[1])
+    return render_template("profile.html", user=current_user.user)
 
 
 @app.route("/logout")
-def logout() -> None:
-    session.clear()
+def logout() -> str:
+    logout_user()
     return redirect(url_for("login"))

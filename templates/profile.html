@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+    <meta charset="UTF-8">
+    <title>Profile</title>
+</head>
+
+<body>
+    <h2>Hello,{{user}}</h2>
+    <a href="{{url_for('logout')}}">
+        <button type="submit">Logout</button>
+    </a>
+</body>
+
+</html>
