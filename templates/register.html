@@ -8,24 +8,20 @@
 </head>
 
 <body>
-    <h1>Register</h1>
+    <h1>Registration</h1>
     {% for cat,msg in get_flashed_messages(True) %}
     <div class="flash {{cat}}">{{msg}}</div>
     {% endfor %}
     <div class="container">
         <form action="{{url_for('register')}}" method="post">
-            <label for="username">Enter your username</label>
-            <br>
-            <input id="username" name="username" type="text">
-            <br>
-            <label for="password">Enter your password</label>
-            <input id="password" name="password" type="password">
-            <br>
-            <label for="check">Repeat your password</label>
-            <br>
-            <input id="check" name="check" type="password">
-            <br>
-            <button type="submit">Register</button>
+            {{ form.hidden_tag() }}
+            {{ form.username.label() }}
+            {{ form.username() }}
+            {{ form.password.label() }}
+            {{ form.password() }}
+            {{ form.check_password.label() }}
+            {{ form.check_password() }}
+            {{ form.submit() }}
         </form>
     </div>
 </body>

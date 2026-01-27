@@ -94,12 +94,12 @@ def login() -> str:
 
 
 @login_manager.user_loader
-@login_required
 def load_user(user_id: int) -> UserLogin:
     return UserLogin().fromDB(user_id, get_db())
 
 
 @app.route("/profile")
+@login_required
 def profile() -> str:
     return render_template("profile.html", user=current_user.username)
 

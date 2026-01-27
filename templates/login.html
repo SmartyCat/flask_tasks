@@ -14,15 +14,12 @@
     {% endfor %}
     <div class="container">
         <form action="{{url_for('login')}}" method="post">
-            <label for="username">Enter your username</label>
-            <br>
-            <input id="username" name="username" type="text">
-            <br>
-            <label for="password">Enter your password</label>
-            <br>
-            <input id="password" name="password" type="password">
-            <br>
-            <button type="submit">Enter</button>
+            {{ form.hidden_tag() }}
+            {{ form.username.label() }}
+            {{ form.username() }}
+            {{ form.password.label() }}
+            {{ form.password() }}
+            {{ form.submit() }}
         </form>
         <a href="{{url_for('register')}}">Registration</a>
     </div>
