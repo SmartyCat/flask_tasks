@@ -1,27 +1,27 @@
-from flask import Flask, render_template, request, g, redirect, url_for, session, flash
+from flask import Flask, render_template, g, redirect, url_for, flash
 import sqlite3
-from werkzeug.security import generate_password_hash, check_password_hash
-from flask_login import (
-    LoginManager,
-    login_user,
-    login_required,
-    current_user,
-    logout_user,
-)
+from loginform import RegisterForm, LoginForm
 from userlogin import UserLogin
+from flask_login import (
+    login_user,
+    logout_user,
+    current_user,
+    LoginManager,
+    login_required,
+)
+from werkzeug.security import generate_password_hash, check_password_hash
 
 DATABASE = "users.db"
 DEBUG = True
-SECRET_KEY = "sfjvhdfll;134sfv"
+SECRET_KEY = "fgjbfog12sdf"
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 
-
-login_manger = LoginManager(app)
-login_manger.login_view = "login"
-login_manger.login_message = "You need to enter in the system"
-login_manger.login_message_category = "error"
+login_manager = LoginManager(app)
+login_manager.login_view = "login"
+login_manager.login_message = "You need autho"
+login_manager.login_message_category = "error"
 
 
 def connect_db() -> sqlite3.Connection:
@@ -30,8 +30,8 @@ def connect_db() -> sqlite3.Connection:
 
 def create_db() -> None:
     db = connect_db()
-    with app.open_resource("users.sql", mode="r") as file:
-        db.cursor().executescript(file.read())
+    with app.open_resource("users.sql", mode="r") as f:
+        db.cursor().executescript(f.read())
     db.commit()
     db.close()
 
@@ -55,70 +55,53 @@ def index() -> str:
 
 @app.route("/register", methods=["GET", "POST"])
 def register() -> str:
-    db = get_db()
-    if current_user.is_authenticated:
-        return redirect(url_for("profile"))
-    if request.method == "POST":
-        username, password, check_password = (
-            request.form.get("username"),
-            request.form.get("password"),
-            request.form.get("check"),
-        )
-        if not username or not password or not check_password:
-            flash("You must fill all the fills", category="error")
-        elif (
-            db.cursor()
-            .execute("SELECT * FROM users WHERE username = ?", (username,))
-            .fetchone()
-        ):
+    db = get_db().cursor()
+    form = RegisterForm()
+    if form.validate_on_submit():
+        if form.password.data != form.check_password.data:
+            flash("Incorrect password", category="error")
+        elif db.execute(
+            "SELECT * FROM users WHERE username = ?", (form.username.data,)
+        ).fetchone():
             flash("The user already exists", category="error")
-        elif password != check_password:
-            flash("The passwords don't match", category="error")
         else:
-            db.cursor().execute(
-                "INSERT INTO users(username,password) VALUES(?, ?)",
-                (username, generate_password_hash(password)),
+            db.execute(
+                "INSERT INTO users(username, password) VALUES(?, ?)",
+                (form.username.data, generate_password_hash(form.password.data)),
             )
-            db.commit()
-            flash("Success", category="success")
+            get_db().commit()
             return redirect(url_for("login"))
-    return render_template("register.html")
+    return render_template("register.html", form=form)
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login() -> str:
-    db = get_db()
-    if request.method == "POST":
-        user = (
-            db.cursor()
-            .execute(
-                "SELECT * FROM users WHERE username = ?",
-                (request.form.get("username"),),
-            )
-            .fetchone()
-        )
+    db = get_db().cursor()
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = db.execute(
+            "SELECT * FROM users WHERE username = ?", (form.username.data,)
+        ).fetchone()
         if not user:
             flash("The user doesn't exist", category="error")
-        elif not check_password_hash(user[2], request.form.get("password")):
+        elif not check_password_hash(user[2], form.password.data):
             flash("Incorrect password", category="error")
         else:
-            user_login = UserLogin().create(user)
-            rm = True if request.form.get("remember") else False
-            login_user(user_login, remember=rm)
-            flash("Success", category="success")
+            userlogin = UserLogin().create(user)
+            login_user(userlogin)
             return redirect(url_for("profile"))
-    return render_template("login.html")
+    return render_template("login.html", form=form)
 
 
-@login_manger.user_loader
+@login_manager.user_loader
+@login_required
 def load_user(user_id: int) -> UserLogin:
     return UserLogin().fromDB(user_id, get_db())
 
 
 @app.route("/profile")
-@login_required
 def profile() -> str:
-    return render_template("profile.html", user=current_user.user)
+    return render_template("profile.html", user=current_user.username)
 
 
 @app.route("/logout")
