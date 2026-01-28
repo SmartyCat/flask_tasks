@@ -1,24 +1,26 @@
-from flask import Flask, render_template, g, redirect, url_for, flash
+from flask import Flask, render_template, redirect, url_for, g, flash
 import sqlite3
-from loginform import RegisterForm, LoginForm
-from userlogin import UserLogin
 from flask_login import (
-    login_user,
-    logout_user,
-    current_user,
     LoginManager,
+    current_user,
+    logout_user,
     login_required,
+    login_user,
 )
+from userlogin import UserLogin
+from forms import RegisterForm, LoginForm
 from werkzeug.security import generate_password_hash, check_password_hash
 
 DATABASE = "users.db"
 DEBUG = True
-SECRET_KEY = "fgjbfog12sdf"
+SECRET_KEY = "dfgbndgkob13dvblfv"
+
 
 app = Flask(__name__)
 app.config.from_object(__name__)
 
 login_manager = LoginManager(app)
+
 login_manager.login_view = "login"
 login_manager.login_message = "You need autho"
 login_manager.login_message_category = "error"
@@ -30,8 +32,8 @@ def connect_db() -> sqlite3.Connection:
 
 def create_db() -> None:
     db = connect_db()
-    with app.open_resource("users.sql", mode="r") as f:
-        db.cursor().executescript(f.read())
+    with app.open_resource("users.sql", mode="r") as file:
+        db.cursor().executescript(file.read())
     db.commit()
     db.close()
 
@@ -55,40 +57,44 @@ def index() -> str:
 
 @app.route("/register", methods=["GET", "POST"])
 def register() -> str:
-    db = get_db().cursor()
+    db = get_db()
     form = RegisterForm()
     if form.validate_on_submit():
-        if form.password.data != form.check_password.data:
-            flash("Incorrect password", category="error")
-        elif db.execute(
-            "SELECT * FROM users WHERE username = ?", (form.username.data,)
-        ).fetchone():
+        if (
+            db.cursor()
+            .execute("SELECT * FROM users WHERE username = ?", (form.username.data,))
+            .fetchone()
+        ):
             flash("The user already exists", category="error")
         else:
-            db.execute(
+            db.cursor().execute(
                 "INSERT INTO users(username, password) VALUES(?, ?)",
                 (form.username.data, generate_password_hash(form.password.data)),
             )
-            get_db().commit()
+            flash("The user was added", category="success")
+            db.commit()
             return redirect(url_for("login"))
     return render_template("register.html", form=form)
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login() -> str:
-    db = get_db().cursor()
+    db = get_db()
     form = LoginForm()
+    if current_user.is_authenticated:
+        return redirect(url_for("profile"))
     if form.validate_on_submit():
-        user = db.execute(
-            "SELECT * FROM users WHERE username = ?", (form.username.data,)
-        ).fetchone()
+        user = (
+            db.cursor()
+            .execute("SELECT * FROM users WHERE username = ?", (form.username.data,))
+            .fetchone()
+        )
         if not user:
             flash("The user doesn't exist", category="error")
-        elif not check_password_hash(user[2], form.password.data):
-            flash("Incorrect password", category="error")
         else:
             userlogin = UserLogin().create(user)
-            login_user(userlogin)
+            login_user(userlogin, remember=form.username.data)
+            flash("Yeahh", category="success")
             return redirect(url_for("profile"))
     return render_template("login.html", form=form)
 
@@ -99,9 +105,8 @@ def load_user(user_id: int) -> UserLogin:
 
 
 @app.route("/profile")
-@login_required
 def profile() -> str:
-    return render_template("profile.html", user=current_user.username)
+    return render_template("profile.html", username=current_user.username)
 
 
 @app.route("/logout")

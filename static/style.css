@@ -74,3 +74,7 @@ a {
 a:hover {
     text-decoration: underline;
 }
+
+.invalid {
+    color: #842029;
+}

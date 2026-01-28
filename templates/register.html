@@ -2,26 +2,33 @@
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="{{url_for('static',filename='style.css')}}">
+    <link rel="stylesheet" href="{{url_for('static', filename='style.css')}}">
     <meta charset="UTF-8">
     <title>Register</title>
 </head>
 
 <body>
-    <h1>Registration</h1>
+    <h1>Register</h1>
     {% for cat,msg in get_flashed_messages(True) %}
     <div class="flash {{cat}}">{{msg}}</div>
     {% endfor %}
     <div class="container">
         <form action="{{url_for('register')}}" method="post">
             {{ form.hidden_tag() }}
-            {{ form.username.label() }}
-            {{ form.username() }}
-            {{ form.password.label() }}
-            {{ form.password() }}
-            {{ form.check_password.label() }}
-            {{ form.check_password() }}
-            {{ form.submit() }}
+            {% for field in form if field.name not in ['csrf_token', 'remember', 'submit'] %}
+            {{ field.label() }}
+            {% if field.errors %}
+            {{field(class="invalid")}}
+            <span>
+                {% for e in field.erros %}
+                {{e}}
+                {% endfor %}
+            </span>
+            {% else %}
+            {{field()}}
+            {% endif %}
+            {% endfor %}
+            {{form.submit()}}
         </form>
     </div>
 </body>
