@@ -1,8 +1,9 @@
-from flask import Flask, redirect, url_for
+from flask import Flask, render_template, redirect, url_for
 from main.routes import main
 
+SECRET_KEY = "SDKFJSsfvd23"
 app = Flask(__name__)
-
+app.config.from_object(__name__)
 app.register_blueprint(main, url_prefix="/")
 
 
